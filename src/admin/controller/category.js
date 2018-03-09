@@ -32,6 +32,30 @@ module.exports = class extends Base {
     return this.success(data);
   }
 
+
+  async cascaderAction()
+  {
+      const model = this.model('category');
+      const data = await model.where({is_show: 1}).order(['sort_order ASC']).select();
+      const topCategory = data.filter((item) => {
+          return item.parent_id === 0;
+      });
+      const categoryList = [];
+      topCategory.map((item) => {
+          item.level = 1;
+          //categoryList.push(item);
+          item.children = [];
+          data.map((child) => {
+              if (child.parent_id === item.id) {
+                  child.level = 2;
+                  item.children.push(child);
+                  //categoryList.push(child);
+              }
+          });
+      });
+      return this.success(topCategory);
+  }
+
   async infoAction() {
     const id = this.get('id');
     const model = this.model('category');
