@@ -36,6 +36,9 @@ module.exports = class extends Base {
     values.is_on_sale = values.is_on_sale ? 1 : 0;
     values.is_new = values.is_new ? 1 : 0;
     values.is_hot = values.is_hot ? 1 : 0;
+
+    console.log("good save:" + values);
+
     if (id > 0) {
       await model.where({id: id}).update(values);
     } else {

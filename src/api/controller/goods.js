@@ -109,6 +109,8 @@ module.exports = class extends Base {
     const goodsQuery = this.model('goods');
 
     const whereMap = {};
+
+    whereMap.is_on_sale = 1;
     if (!think.isEmpty(isNew)) {
       whereMap.is_new = isNew;
     }

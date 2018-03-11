@@ -3,6 +3,8 @@
 -- Host: 39.108.108.55    Database: nideshop
 -- ------------------------------------------------------
 -- Server version	5.7.20
+CREATE SCHEMA `nideshop` DEFAULT CHARACTER SET utf8mb4 ;
+use nideshop;
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
