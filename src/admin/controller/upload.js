@@ -8,14 +8,22 @@ module.exports = class extends Base {
       return this.fail('保存失败');
     }
     const that = this;
-    const filename = '/static/upload/brand/' + think.uuid(32) + '.jpg';
+
+    const fileRootRelateDir = '/www/';
+    const fileRelateDir = '/static/upload/brand/';
+
+    const fileDir = think.ROOT_PATH + fileRootRelateDir + fileRelateDir;
+    
+    think.mkdir(fileDir);
+
+    const filename = think.uuid(32) + '.jpg';
     const is = fs.createReadStream(brandFile.path);
-    const os = fs.createWriteStream(think.ROOT_PATH + '/www' + filename);
+    const os = fs.createWriteStream(fileDir + filename);
     is.pipe(os);
 
     return that.success({
       name: 'brand_pic',
-      fileUrl: 'http://127.0.0.1:8360' + filename
+      fileUrl: 'http://127.0.0.1:8360' + fileRelateDir + filename
     });
   }
 
