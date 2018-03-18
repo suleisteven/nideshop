@@ -31,6 +31,21 @@ module.exports = class extends Base {
     const model = this.model('goods');
 
     const info = await model.where({'id': goodsId}).find();
+
+    // 处理商品图片详情，转换为前端能识别的h5标签
+    try{
+      info.goods_desc = JSON.parse(info.goods_desc);
+    }catch(e)
+    {
+      info.goods_desc = [];
+    }
+    
+    let tmpDesc = "";
+    info.goods_desc.map((item)=>{
+        tmpDesc += '<p><img src="' + item + '"/></p>';
+    });
+    info.goods_desc = tmpDesc;
+
     const gallery = await this.model('goods_gallery').where({goods_id: goodsId}).limit(4).select();
     const attribute = await this.model('goods_attribute').field('nideshop_goods_attribute.value, nideshop_attribute.name').join('nideshop_attribute ON nideshop_goods_attribute.attribute_id=nideshop_attribute.id').order({'nideshop_goods_attribute.id': 'asc'}).where({'nideshop_goods_attribute.goods_id': goodsId}).select();
     const issue = await this.model('goods_issue').select();

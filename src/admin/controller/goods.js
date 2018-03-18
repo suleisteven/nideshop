@@ -21,6 +21,13 @@ module.exports = class extends Base {
     const model = this.model('goods');
     const data = await model.where({id: id}).find();
 
+    try{
+      data.goods_desc = JSON.parse(data.goods_desc);
+    }catch(e)
+    {
+      data.goods_desc = [];
+    }
+
     return this.success(data);
   }
 
@@ -36,6 +43,8 @@ module.exports = class extends Base {
     values.is_on_sale = values.is_on_sale ? 1 : 0;
     values.is_new = values.is_new ? 1 : 0;
     values.is_hot = values.is_hot ? 1 : 0;
+
+    values.goods_desc = JSON.stringify(values.goods_desc);
 
     if (id > 0) {
       await model.where({id: id}).update(values);

@@ -9,6 +9,8 @@ module.exports = class extends Base {
     }
     const that = this;
 
+    let params = that.post(); // 透传参数
+
     const fileRootRelateDir = '/www/';
     const fileRelateDir = '/static/upload/brand/';
 
@@ -23,6 +25,7 @@ module.exports = class extends Base {
 
     return that.success({
       name: 'brand_pic',
+      params: params,
       fileUrl: 'http://127.0.0.1:8360' + fileRelateDir + filename
     });
   }
