@@ -14,5 +14,5 @@ module.exports = {
     appkey: '', // 对应快递鸟用户后台 API key
     request_url: 'http://api.kdniao.cc/Ebusiness/EbusinessOrderHandle.aspx'
   },
-  imgUrlPrefix: "http://192.168.1.107:8360",
+  imgUrlPrefix: "http://127.0.0.1:8360",
 };
