@@ -1,5 +1,6 @@
 const Base = require('./base.js');
 const fs = require('fs');
+const Config = require('../../common/config/config');
 
 module.exports = class extends Base {
   async brandPicAction() {
@@ -26,7 +27,7 @@ module.exports = class extends Base {
     return that.success({
       name: 'brand_pic',
       params: params,
-      fileUrl: 'http://127.0.0.1:8360' + fileRelateDir + filename
+      fileUrl: Config.imgUrlPrefix + fileRelateDir + filename
     });
   }
 

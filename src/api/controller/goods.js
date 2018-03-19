@@ -1,4 +1,5 @@
 const Base = require('./base.js');
+const Config = require('../../common/config/config');
 
 module.exports = class extends Base {
   async indexAction() {
@@ -42,6 +43,12 @@ module.exports = class extends Base {
     
     let tmpDesc = "";
     info.goods_desc.map((item)=>{
+
+        if(!item.startsWith("http")) // 处理相对路径
+        {
+          item = Config.imgUrlPrefix + item;
+        }
+
         tmpDesc += '<p><img src="' + item + '"/></p>';
     });
     info.goods_desc = tmpDesc;

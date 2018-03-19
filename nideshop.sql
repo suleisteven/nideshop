@@ -554,6 +554,7 @@ CREATE TABLE `nideshop_goods` (
   `is_app_exclusive` tinyint(1) unsigned NOT NULL COMMENT '是否是APP专属',
   `is_limited` tinyint(1) unsigned NOT NULL,
   `is_hot` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  
   PRIMARY KEY (`id`),
   KEY `goods_sn` (`goods_sn`),
   KEY `cat_id` (`category_id`),
@@ -1172,3 +1173,6 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2018-02-09 20:26:21
+
+/*`stock_type` int(4) NOT NULL DEFAULT '0' COMMENT '进货类型，0-亚马逊、1-丹麦产地直达',*/
+alter table nideshop_goods add stock_type int(4) NOT NULL DEFAULT '0' COMMENT '进货类型，0-亚马逊、1-丹麦产地直达';

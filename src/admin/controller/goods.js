@@ -1,4 +1,5 @@
 const Base = require('./base.js');
+const Config = require('../../common/config/config');
 
 module.exports = class extends Base {
   /**
@@ -23,6 +24,15 @@ module.exports = class extends Base {
 
     try{
       data.goods_desc = JSON.parse(data.goods_desc);
+
+      data.goods_desc.map((item, index)=>{
+          if(!item.startsWith("http")) // 处理相对路径
+          {
+            item = Config.imgUrlPrefix + item;
+            data.goods_desc[index] = item;
+          }
+      });
+
     }catch(e)
     {
       data.goods_desc = [];
