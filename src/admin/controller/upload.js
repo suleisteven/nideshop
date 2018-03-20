@@ -84,4 +84,18 @@ module.exports = class extends Base {
       fileUrl: 'http://127.0.0.1:8360' + filename
     });
   }
+
+  async deleteImg()
+  {
+
+    console.log("deleteImg");
+      const params = this.post();
+      const that = this;
+
+
+      return that.success({
+        name: 'brand_new_pic',
+      });
+  }
+
 };
