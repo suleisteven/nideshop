@@ -1,5 +1,6 @@
 const Base = require('./base.js');
 const Config = require('../../common/config/config');
+const Upload = require('./upload.js');
 
 module.exports = class extends Base {
   /**
@@ -56,12 +57,18 @@ module.exports = class extends Base {
 
     values.goods_desc = JSON.stringify(values.goods_desc);
 
+    
+
     if (id > 0) {
       await model.where({id: id}).update(values);
     } else {
       delete values.id;
       await model.add(values);
     }
+
+    // 删除服务器中的图片文件
+    Upload.deleteImg(values.deletedDescPics);
+
     return this.success(values);
   }
 

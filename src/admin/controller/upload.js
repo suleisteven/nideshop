@@ -12,8 +12,8 @@ module.exports = class extends Base {
 
     let params = that.post(); // 透传参数
 
-    const fileRootRelateDir = '/www/';
-    const fileRelateDir = '/static/upload/brand/';
+    const fileRootRelateDir = Config.imgRootPath;
+    const fileRelateDir = Config.imgFileRelateDir;
 
     const fileDir = think.ROOT_PATH + fileRootRelateDir + fileRelateDir;
     
@@ -85,7 +85,7 @@ module.exports = class extends Base {
     });
   }
 
-  async deleteImg()
+  async deleteImgAction()
   {
 
     console.log("deleteImg");
@@ -98,4 +98,35 @@ module.exports = class extends Base {
       });
   }
 
+  /**
+   * 删除图片
+   * @param {*} imgUrls 
+   */
+  static deleteImg(imgUrls)
+  {
+
+    if(imgUrls && imgUrls.length!=0)
+    {
+      imgUrls.map((url)=>{
+
+        let path = "";
+        
+        if(url.startsWith("http"))
+        {
+          let index = url.indexOf(Config.imgFileRelateDir);
+          path = think.ROOT_PATH + Config.imgRootPath + url.substring(index, url.length);
+        }else{
+          path = url;
+        }
+
+        fs.exists(path, (isExists)=>{
+          if(isExists)
+          {
+            fs.unlinkSync(path); // 删除文件
+          }
+        })
+
+      });
+    }
+  }
 };

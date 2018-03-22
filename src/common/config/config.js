@@ -15,4 +15,8 @@ module.exports = {
     request_url: 'http://api.kdniao.cc/Ebusiness/EbusinessOrderHandle.aspx'
   },
   imgUrlPrefix: "http://127.0.0.1:8360",
+
+  imgRootPath:"/www/",
+
+  imgFileRelateDir : "/static/upload/brand/",
 };
