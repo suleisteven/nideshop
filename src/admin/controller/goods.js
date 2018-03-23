@@ -21,8 +21,11 @@ module.exports = class extends Base {
   async infoAction() {
     const id = this.get('id');
     const model = this.model('goods');
-    const data = await model.where({id: id}).find();
 
+    const data = await model.where({id: id}).find();
+    const gallery = await this.model('goods_gallery').where({goods_id: id}).limit(4).select();
+
+    data.gallery = gallery;
     try{
       data.goods_desc = JSON.parse(data.goods_desc);
 
@@ -57,8 +60,6 @@ module.exports = class extends Base {
 
     values.goods_desc = JSON.stringify(values.goods_desc);
 
-    
-
     if (id > 0) {
       await model.where({id: id}).update(values);
     } else {
@@ -66,7 +67,35 @@ module.exports = class extends Base {
       await model.add(values);
     }
 
-    // 删除服务器中的图片文件
+    // 更新商品banner
+    const gallery = values.gallery;
+    if(gallery)
+    {
+      gallery.map((item)=>{
+        let galleryModel = this.model('goods_gallery');
+        item.goods_id = id;
+        if(item.id >0 )
+        {
+          galleryModel.where({goods_id: item.goods_id}).update(item);
+        }else{
+          galleryModel.add(item);
+        }
+      });
+    }
+    
+    if(values.deletedGalleries && values.deletedGalleries.length>0)
+    {
+      let deletedGalleryPics = [];
+      values.deletedGalleries.map((item)=>{
+        deletedGalleryPics.push(item.img_url);
+      });
+
+        // 删除服务器中的商品banner图片文件
+        Upload.deleteImg(deletedGalleryPics);
+    }
+  
+
+    // 删除服务器中的详情图片文件
     Upload.deleteImg(values.deletedDescPics);
 
     return this.success(values);
