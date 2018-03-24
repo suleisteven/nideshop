@@ -16,7 +16,8 @@ module.exports = {
   },
   imgUrlPrefix: "http://127.0.0.1:8360",
 
-  imgRootPath:"/www/",
+  imgRootPath:"/www", // 上传图片所在目录
 
-  imgFileRelateDir : "/static/upload/brand/",
+  imgFileRelateDir : "/static/upload/pics/final/", // 图片所在正式目录
+  imgFileTmpRelateDir : "/static/upload/pics/tmp/", // 图片所在临时目录，上传的图片，如果未保存则会在临时目录。临时目录在项目启动时会进行清除
 };

@@ -4,7 +4,7 @@ const Config = require('../../common/config/config');
 module.exports = class extends Base {
   async indexAction() {
     const model = this.model('goods');
-    const goodsList = await model.select();
+    const goodsList = await model.order(['sort_order ASC']).select();
 
     return this.success(goodsList);
   }
@@ -165,7 +165,8 @@ module.exports = class extends Base {
     } else {
       // 按商品添加时间
       orderMap = {
-        id: 'desc'
+        //id: 'desc'
+        sort_order: 'ASC' // 按排序号
       };
     }
 
