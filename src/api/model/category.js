@@ -1,6 +1,6 @@
 module.exports = class extends think.Model {
   async getChildCategoryId(parentId) {
-    const childIds = await this.where({parent_id: parentId}).getField('id', 10000);
+    const childIds = await this.where({parent_id: parentId}).order(['sort_order ASC']).getField('id', 10000);
     return childIds;
   }
 

@@ -1,4 +1,6 @@
 const Base = require('./base.js');
+const Config = require('../../common/config/config');
+const FileUtil = require('../../common/fileutil');
 
 module.exports = class extends Base {
   /**
@@ -27,8 +29,9 @@ module.exports = class extends Base {
   }
 
   async topCategoryAction() {
+    
     const model = this.model('category');
-    const data = await model.where({parent_id: 0}).order(['id ASC']).select();
+    const data = await model.where({parent_id: 0}).order(['sort_order ASC','id ASC']).select();
 
     return this.success(data);
   }
@@ -61,7 +64,7 @@ module.exports = class extends Base {
   async infoAction() {
     const id = this.get('id');
     const model = this.model('category');
-    const data = await model.where({id: id}).find();
+    const data = await model.where({id: id}).order(['sort_order ASC']).find();
 
     return this.success(data);
   }
@@ -73,6 +76,20 @@ module.exports = class extends Base {
 
     const values = this.post();
     const id = this.post('id');
+
+
+    let movedPosterImgs = FileUtil.moveTmpImgToFinal(values.wap_banner_url); // 将封面移动到正式目录
+    if(movedPosterImgs && movedPosterImgs.length>0)
+    {
+      values.wap_banner_url = movedPosterImgs[0];
+    }
+
+    if(id==0)
+    {
+      values.level = 'L1';
+    }else{
+      values.level = 'L2';
+    }
 
     const model = this.model('category');
     values.is_show = values.is_show ? 1 : 0;

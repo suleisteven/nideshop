@@ -9,7 +9,7 @@ module.exports = class extends Base {
     const categoryId = this.get('id');
 
     const model = this.model('category');
-    const data = await model.limit(10).where({parent_id: 0}).select();
+    const data = await model.limit(10).where({parent_id: 0}).order(['sort_order ASC']).select();
 
     let currentCategory = null;
     if (categoryId) {
@@ -37,7 +37,7 @@ module.exports = class extends Base {
 
     let currentCategory = null;
     if (categoryId) {
-      currentCategory = await model.where({'id': categoryId}).find();
+      currentCategory = await model.where({'id': categoryId}).order(['sort_order ASC']).find();
     }
     // 获取子分类数据
     if (currentCategory && currentCategory.id) {

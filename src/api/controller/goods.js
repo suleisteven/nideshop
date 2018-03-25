@@ -102,9 +102,9 @@ module.exports = class extends Base {
    */
   async categoryAction() {
     const model = this.model('category');
-    const currentCategory = await model.where({id: this.get('id')}).find();
+    const currentCategory = await model.where({id: this.get('id')}).order(['sort_order ASC']).find();
     const parentCategory = await model.where({id: currentCategory.parent_id}).find();
-    const brotherCategory = await model.where({parent_id: currentCategory.parent_id}).select();
+    const brotherCategory = await model.where({parent_id: currentCategory.parent_id}).order(['sort_order ASC']).select();
 
     return this.success({
       currentCategory: currentCategory,
@@ -242,7 +242,7 @@ module.exports = class extends Base {
     const categoryIds = await goodsQuery.getField('category_id', 10000);
     if (!think.isEmpty(categoryIds)) {
       // 查找二级分类的parent_id
-      const parentIds = await this.model('category').where({id: {'in': categoryIds}}).getField('parent_id', 10000);
+      const parentIds = await this.model('category').where({id: {'in': categoryIds}}).order(['sort_order ASC']).getField('parent_id', 10000);
       // 一级分类
       const parentCategory = await this.model('category').field(['id', 'name']).order({'sort_order': 'asc'}).where({'id': {'in': parentIds}}).select();
 
