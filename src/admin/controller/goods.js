@@ -13,6 +13,8 @@ module.exports = class extends Base {
     const size = this.get('size') || 20;
     const name = this.get('name') || '';
     const category_id = this.get('category_id') || '';
+    const sortChecked = this.get('sortChecked') || 0;
+    
 
     const model = this.model('goods');
 
@@ -22,7 +24,15 @@ module.exports = class extends Base {
       params.category_id=category_id;
     }
     
-    const data = await model.where(params).order(['sort_order ASC']).page(page, size).countSelect();
+    let sortParams = [];
+    if(sortChecked==0)
+    {
+      sortParams = ['sort_order ASC'];
+    }else{
+      sortParams = ['id DESC'];
+    }
+
+    const data = await model.where(params).order(sortParams).page(page, size).countSelect();
 
     return this.success(data);
   }

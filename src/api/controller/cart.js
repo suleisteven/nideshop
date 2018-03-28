@@ -49,7 +49,7 @@ module.exports = class extends Base {
    */
   async addAction() {
     const goodsId = this.post('goodsId');
-    const productId = this.post('productId');
+    //const productId = this.post('productId');
     const number = this.post('number');
 
     // 判断商品是否可以购买
