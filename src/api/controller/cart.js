@@ -50,18 +50,23 @@ module.exports = class extends Base {
   async addAction() {
     const goodsId = this.post('goodsId');
     //const productId = this.post('productId');
+    const productId = 0;
     const number = this.post('number');
-
+    
     // 判断商品是否可以购买
     const goodsInfo = await this.model('goods').where({id: goodsId}).find();
-    if (think.isEmpty(goodsInfo) || goodsInfo.is_delete === 1) {
+    if (think.isEmpty(goodsInfo) || goodsInfo.is_delete === 1 || goodsInfo.is_on_sale != 1) {
       return this.fail(400, '商品已下架');
     }
 
     // 取得规格的信息,判断规格库存
-    const productInfo = await this.model('product').where({goods_id: goodsId, id: productId}).find();
-    if (think.isEmpty(productInfo) || productInfo.goods_number < number) {
-      return this.fail(400, '库存不足');
+    // const productInfo = await this.model('product').where({goods_id: goodsId, id: productId}).find();
+    // if (think.isEmpty(productInfo) || productInfo.goods_number < number) {
+    //   return this.fail(400, '库存不足');
+    // }
+    if(goodsInfo.goods_number < number)
+    {
+        return this.fail(400, '库存不足');
     }
 
     // 判断购物车中是否存在此规格商品
@@ -71,35 +76,45 @@ module.exports = class extends Base {
 
       // 添加规格名和值
       let goodsSepcifitionValue = [];
-      if (!think.isEmpty(productInfo.goods_specification_ids)) {
-        goodsSepcifitionValue = await this.model('goods_specification').where({
-          goods_id: goodsId,
-          id: {'in': productInfo.goods_specification_ids.split('_')}
-        }).getField('value');
-      }
+      // if (!think.isEmpty(productInfo.goods_specification_ids)) {
+      //   goodsSepcifitionValue = await this.model('goods_specification').where({
+      //     goods_id: goodsId,
+      //     id: {'in': productInfo.goods_specification_ids.split('_')}
+      //   }).getField('value');
+      // }
 
       // 添加到购物车
       const cartData = {
         goods_id: goodsId,
         product_id: productId,
-        goods_sn: productInfo.goods_sn,
+        //goods_sn: productInfo.goods_sn,
+        goods_sn: goodsInfo.goods_sn,
         goods_name: goodsInfo.name,
         list_pic_url: goodsInfo.list_pic_url,
         number: number,
         session_id: 1,
         user_id: think.userId,
-        retail_price: productInfo.retail_price,
-        market_price: productInfo.retail_price,
-        goods_specifition_name_value: goodsSepcifitionValue.join(';'),
-        goods_specifition_ids: productInfo.goods_specification_ids,
+        //retail_price: productInfo.retail_price,
+        retail_price: goodsInfo.retail_price,
+        //market_price: productInfo.retail_price,
+        market_price: goodsInfo.counter_price,
+        // goods_specifition_name_value: goodsSepcifitionValue.join(';'),
+        // goods_specifition_ids: productInfo.goods_specification_ids,
+        goods_specifition_name_value: "",
+        goods_specifition_ids: "",
         checked: 1
       };
 
       await this.model('cart').thenAdd(cartData, {product_id: productId});
     } else {
       // 如果已经存在购物车中，则数量增加
-      if (productInfo.goods_number < (number + cartInfo.number)) {
-        return this.fail(400, '库存不足');
+      // if (productInfo.goods_number < (number + cartInfo.number)) {
+      //   return this.fail(400, '库存不足');
+      // }
+
+      if(goodsInfo.goods_number < number + cartInfo.number)
+      {
+          return this.fail(400, '库存不足');
       }
 
       await this.model('cart').where({
@@ -267,7 +282,8 @@ module.exports = class extends Base {
 
     return this.success({
       checkedAddress: checkedAddress,
-      freightPrice: freightPrice,
+      //freightPrice: freightPrice,
+      freightPrice: '根据实际情况收取',
       checkedCoupon: {},
       couponList: couponList,
       couponPrice: couponPrice,
