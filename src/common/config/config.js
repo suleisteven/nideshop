@@ -20,4 +20,5 @@ module.exports = {
 
   imgFileRelateDir : "/static/upload/pics/final/", // 图片所在正式目录
   imgFileTmpRelateDir : "/static/upload/pics/tmp/", // 图片所在临时目录，上传的图片，如果未保存则会在临时目录。临时目录在项目启动时会进行清除
+  maxNumberOfGoodsInOrder : 10, // 每笔订单中单个商品可以购买的最大个数
 };

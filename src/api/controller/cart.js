@@ -1,4 +1,5 @@
 const Base = require('./base.js');
+const Config = require('../../common/config/config');
 
 module.exports = class extends Base {
   /**
@@ -64,7 +65,7 @@ module.exports = class extends Base {
     // if (think.isEmpty(productInfo) || productInfo.goods_number < number) {
     //   return this.fail(400, '库存不足');
     // }
-    if(goodsInfo.goods_number < number)
+    if(goodsInfo.goods_number < number || number>Config.maxNumberOfGoodsInOrder)
     {
         return this.fail(400, '库存不足');
     }
@@ -112,7 +113,7 @@ module.exports = class extends Base {
       //   return this.fail(400, '库存不足');
       // }
 
-      if(goodsInfo.goods_number < number + cartInfo.number)
+      if(goodsInfo.goods_number < number + cartInfo.number || number + cartInfo.number>Config.maxNumberOfGoodsInOrder)
       {
           return this.fail(400, '库存不足');
       }
@@ -128,16 +129,29 @@ module.exports = class extends Base {
 
   // 更新指定的购物车信息
   async updateAction() {
+
     const goodsId = this.post('goodsId');
     const productId = this.post('productId'); // 新的product_id
     const id = this.post('id'); // cart.id
     const number = parseInt(this.post('number')); // 不是
 
-    // 取得规格的信息,判断规格库存
-    const productInfo = await this.model('product').where({goods_id: goodsId, id: productId}).find();
-    if (think.isEmpty(productInfo) || productInfo.goods_number < number) {
+    const goodsInfo = await this.model('goods').where({id: goodsId}).find();
+
+    if(think.isEmpty(goodsInfo))
+    {
+      return this.fail(400, '商品不存在或已下架');
+    }
+
+    // // 取得规格的信息,判断规格库存
+    // const productInfo = await this.model('product').where({goods_id: goodsId, id: productId}).find();
+    // if (think.isEmpty(productInfo) || productInfo.goods_number < number) {
+    //   return this.fail(400, '库存不足');
+    // }
+    if(goodsInfo.goods_number < number || number > Config.maxNumberOfGoodsInOrder)
+    {
       return this.fail(400, '库存不足');
     }
+
 
     // 判断是否已经存在product_id购物车商品
     const cartInfo = await this.model('cart').where({id: id}).find();
@@ -155,22 +169,28 @@ module.exports = class extends Base {
       // 直接更新原来的cartInfo
 
       // 添加规格名和值
-      let goodsSepcifition = [];
-      if (!think.isEmpty(productInfo.goods_specification_ids)) {
-        goodsSepcifition = await this.model('goods_specification').field(['nideshop_goods_specification.*', 'nideshop_specification.name']).join('nideshop_specification ON nideshop_specification.id=nideshop_goods_specification.specification_id').where({
-          'nideshop_goods_specification.goods_id': goodsId,
-          'nideshop_goods_specification.id': {'in': productInfo.goods_specification_ids.split('_')}
-        }).select();
-      }
+      // let goodsSepcifition = [];
+      // if (!think.isEmpty(productInfo.goods_specification_ids)) {
+      //   goodsSepcifition = await this.model('goods_specification').field(['nideshop_goods_specification.*', 'nideshop_specification.name']).join('nideshop_specification ON nideshop_specification.id=nideshop_goods_specification.specification_id').where({
+      //     'nideshop_goods_specification.goods_id': goodsId,
+      //     'nideshop_goods_specification.id': {'in': productInfo.goods_specification_ids.split('_')}
+      //   }).select();
+      // }
 
       const cartData = {
         number: number,
-        goods_specifition_name_value: JSON.stringify(goodsSepcifition),
-        goods_specifition_ids: productInfo.goods_specification_ids,
-        retail_price: productInfo.retail_price,
-        market_price: productInfo.retail_price,
+        // goods_specifition_name_value: JSON.stringify(goodsSepcifition),
+        // goods_specifition_ids: productInfo.goods_specification_ids,
+        // retail_price: productInfo.retail_price,
+        // market_price: productInfo.retail_price,
+        // product_id: productId,
+        // goods_sn: productInfo.goods_sn
+        goods_specifition_name_value: [],
+        goods_specifition_ids: '',
+        retail_price: goodsInfo.retail_price,
+        market_price: goodsInfo.counter_price,
         product_id: productId,
-        goods_sn: productInfo.goods_sn
+        goods_sn: goodsInfo.goods_sn
       };
 
       await this.model('cart').where({id: id}).update(cartData);
@@ -178,7 +198,12 @@ module.exports = class extends Base {
       // 合并购物车已有的product信息，删除已有的数据
       const newNumber = number + newCartInfo.number;
 
-      if (think.isEmpty(productInfo) || productInfo.goods_number < newNumber) {
+      // if (think.isEmpty(productInfo) || productInfo.goods_number < newNumber) {
+      //   return this.fail(400, '库存不足');
+      // }
+
+      if(goodsInfo.goods_number < newNumber || newNumber>Config.maxNumberOfGoodsInOrder)
+      {
         return this.fail(400, '库存不足');
       }
 
@@ -186,12 +211,18 @@ module.exports = class extends Base {
 
       const cartData = {
         number: newNumber,
-        goods_specifition_name_value: newCartInfo.goods_specifition_name_value,
-        goods_specifition_ids: newCartInfo.goods_specification_ids,
-        retail_price: productInfo.retail_price,
-        market_price: productInfo.retail_price,
+        // goods_specifition_name_value: newCartInfo.goods_specifition_name_value,
+        // goods_specifition_ids: newCartInfo.goods_specification_ids,
+        // retail_price: productInfo.retail_price,
+        // market_price: productInfo.retail_price,
+        // product_id: productId,
+        // goods_sn: productInfo.goods_sn
+        goods_specifition_name_value: [],
+        goods_specifition_ids: '',
+        retail_price: goodsInfo.retail_price,
+        market_price: goodsInfo.counter_price,
         product_id: productId,
-        goods_sn: productInfo.goods_sn
+        goods_sn: goodsInfo.goods_sn
       };
 
       await this.model('cart').where({id: id}).update(cartData);

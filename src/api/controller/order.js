@@ -1,5 +1,6 @@
 const Base = require('./base.js');
 const moment = require('moment');
+const Config = require('../../common/config/config');
 
 module.exports = class extends Base {
   /**
@@ -94,6 +95,17 @@ module.exports = class extends Base {
     let goodsTotalPrice = 0.00;
     for (const cartItem of checkedGoodsList) {
       goodsTotalPrice += cartItem.number * cartItem.retail_price;
+
+      const curGoodsInfo = await this.model('goods').where({ id: cartItem.goods_id}).find();
+      if(think.isEmpty(curGoodsInfo))
+      {
+        return this.fail('商品' + curGoodsInfo.name + "不存在或已下架");
+      }
+
+      if(curGoodsInfo.goods_number <cartItem.number || cartItem.number > Config.maxNumberOfGoodsInOrder) // 库存不足
+      {
+        return this.fail('商品' + curGoodsInfo.name + '库存不足');
+      }
     }
 
     // 获取订单使用的优惠券
