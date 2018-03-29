@@ -250,10 +250,17 @@ module.exports = class extends Base {
     // 选择的收货地址
     let checkedAddress = null;
     if (addressId) {
-      checkedAddress = await this.model('address').where({is_default: 1, user_id: think.userId}).find();
-    } else {
       checkedAddress = await this.model('address').where({id: addressId, user_id: think.userId}).find();
+    } else {
+      checkedAddress = await this.model('address').where({is_default: 1, user_id: think.userId}).find();
     }
+
+    // 当前没有选择地址，默认选一个
+    if(think.isEmpty(checkedAddress))
+    {
+      checkedAddress = await this.model('address').where({user_id: think.userId}).find();
+    }
+    
 
     if (!think.isEmpty(checkedAddress)) {
       checkedAddress.province_name = await this.model('region').getRegionName(checkedAddress.province_id);
