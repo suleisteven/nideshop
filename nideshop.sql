@@ -1176,3 +1176,5 @@ UNLOCK TABLES;
 
 /*`stock_type` int(4) NOT NULL DEFAULT '0' COMMENT '进货类型，0-亚马逊、1-丹麦产地直达',*/
 alter table nideshop_goods add stock_type int(4) NOT NULL DEFAULT '0' COMMENT '进货类型，0-亚马逊、1-丹麦产地直达';
+
+alter table nideshop_goods add attribute text COMMENT '商品参数，例如：[{"name":"颜色", "value":"白色"},{"name":"尺寸","value":"17*18*20cm"}]';

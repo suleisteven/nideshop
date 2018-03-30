@@ -54,7 +54,13 @@ module.exports = class extends Base {
     info.goods_desc = tmpDesc;
 
     const gallery = await this.model('goods_gallery').where({goods_id: goodsId}).limit(4).select();
-    const attribute = await this.model('goods_attribute').field('nideshop_goods_attribute.value, nideshop_attribute.name').join('nideshop_attribute ON nideshop_goods_attribute.attribute_id=nideshop_attribute.id').order({'nideshop_goods_attribute.id': 'asc'}).where({'nideshop_goods_attribute.goods_id': goodsId}).select();
+    //const attribute = await this.model('goods_attribute').field('nideshop_goods_attribute.value, nideshop_attribute.name').join('nideshop_attribute ON nideshop_goods_attribute.attribute_id=nideshop_attribute.id').order({'nideshop_goods_attribute.id': 'asc'}).where({'nideshop_goods_attribute.goods_id': goodsId}).select();
+    let attribute = [];
+    if(!think.isEmpty(info.attribute))
+    {
+      attribute = JSON.parse(info.attribute);
+    }
+    
     const issue = await this.model('goods_issue').select();
     const brand = await this.model('brand').where({id: info.brand_id}).find();
 

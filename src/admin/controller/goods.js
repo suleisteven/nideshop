@@ -47,7 +47,6 @@ module.exports = class extends Base {
     data.gallery = gallery;
     try{
       data.goods_desc = JSON.parse(data.goods_desc);
-
       data.goods_desc.map((item, index)=>{
           if(!item.startsWith("http")) // 处理相对路径
           {
@@ -60,6 +59,20 @@ module.exports = class extends Base {
     {
       data.goods_desc = [];
     }
+
+    
+    if(!think.isEmpty(data.attribute))
+    {
+      try{
+        data.attribute = JSON.parse(data.attribute);
+      }catch(e)
+      {
+        data.attribute = [];
+      }
+    }else{
+      data.attribute = [];
+    }
+   
 
     return this.success(data);
   }
@@ -86,6 +99,7 @@ module.exports = class extends Base {
     }
 
     values.goods_desc = JSON.stringify(values.goods_desc);
+    values.attribute = JSON.stringify(values.attribute);
     
     if (id > 0) {
       await model.where({id: id}).update(values);
