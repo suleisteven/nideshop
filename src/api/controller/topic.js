@@ -12,6 +12,26 @@ module.exports = class extends Base {
     const model = this.model('topic');
     const data = await model.where({id: this.get('id')}).find();
 
+      // 处理商品图片详情，转换为前端能识别的h5标签
+      try{
+        data.content = JSON.parse(data.content);
+      }catch(e)
+      {
+        data.content = [];
+      }
+
+      let tmpDesc = "";
+      data.content.map((item)=>{
+
+          if(!item.startsWith("http")) // 处理相对路径
+          {
+            item = Config.imgUrlPrefix + item;
+          }
+
+          tmpDesc += '<p><img src="' + item + '"/></p>';
+      });
+      data.content = tmpDesc;
+
     return this.success(data);
   }
 

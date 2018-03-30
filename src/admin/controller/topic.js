@@ -1,4 +1,7 @@
 const Base = require('./base.js');
+const Config = require('../../common/config/config');
+const Upload = require('./upload.js');
+const FileUtil = require('../../common/fileutil');
 
 module.exports = class extends Base {
   /**
@@ -21,6 +24,20 @@ module.exports = class extends Base {
     const model = this.model('topic');
     const data = await model.where({id: id}).find();
 
+    try{
+      data.content = JSON.parse(data.content);
+      data.content.map((item, index)=>{
+          if(!item.startsWith("http")) // 处理相对路径
+          {
+            item = Config.imgUrlPrefix + item;
+            data.content[index] = item;
+          }
+      });
+    }catch(e)
+    {
+      data.content = [];
+    }
+
     return this.success(data);
   }
 
@@ -32,6 +49,16 @@ module.exports = class extends Base {
     const values = this.post();
     const id = this.post('id');
 
+    values.content = FileUtil.moveTmpImgToFinal(values.content); // 将详情图片移动到正式目录
+
+    let movedPosterImgs = FileUtil.moveTmpImgToFinal(values.scene_pic_url); // 将封面移动到正式目录
+    if(movedPosterImgs && movedPosterImgs.length>0)
+    {
+      values.scene_pic_url = movedPosterImgs[0];
+    }
+
+    values.content = JSON.stringify(values.content);
+
     const model = this.model('topic');
     values.is_show = values.is_show ? 1 : 0;
     values.is_new = values.is_new ? 1 : 0;
@@ -41,6 +68,11 @@ module.exports = class extends Base {
       delete values.id;
       await model.add(values);
     }
+
+
+    // 删除服务器中的详情图片文件
+    FileUtil.deleteImg(values.deletedPics);
+
     return this.success(values);
   }
 
