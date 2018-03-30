@@ -5,7 +5,7 @@ const Util = require('../../common/util');
 
 module.exports = class extends Base {
   async brandPicAction() {
-    const brandFile = this.file('brand_pic');
+    const brandFile = this.file('pic');
     if (think.isEmpty(brandFile)) {
       return this.fail('保存失败');
     }
@@ -26,7 +26,7 @@ module.exports = class extends Base {
     is.pipe(os);
 
     return that.success({
-      name: 'brand_pic',
+      name: 'pic',
       params: params,
       fileUrl: Config.imgUrlPrefix + fileRelateDir + filename
     });
