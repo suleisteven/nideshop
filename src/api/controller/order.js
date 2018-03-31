@@ -8,7 +8,7 @@ module.exports = class extends Base {
    * @return {Promise} []
    */
   async listAction() {
-    const orderList = await this.model('order').where({ user_id: think.userId }).page(1, 10).countSelect();
+    const orderList = await this.model('order').where({ user_id: think.userId }).order(['id DESC']).page(1, 10).countSelect();
     const newOrderList = [];
     for (const item of orderList.data) {
       // 订单的商品
@@ -33,7 +33,7 @@ module.exports = class extends Base {
 
   async detailAction() {
     const orderId = this.get('orderId');
-    const orderInfo = await this.model('order').where({ user_id: 1, id: orderId }).find();
+    const orderInfo = await this.model('order').where({ user_id: think.userId, id: orderId }).find();
 
     if (think.isEmpty(orderInfo)) {
       return this.fail('订单不存在');
@@ -51,7 +51,7 @@ module.exports = class extends Base {
 
     // 订单状态的处理
     orderInfo.order_status_text = await this.model('order').getOrderStatusText(orderId);
-    orderInfo.add_time = moment.unix(orderInfo.add_time).format('YYYY-MM-DD HH:mm:ss');
+    orderInfo.add_time = moment.unix(orderInfo.add_time*1000).format('YYYY-MM-DD HH:mm:ss');
     orderInfo.final_pay_time = moment('001234', 'Hmmss').format('mm:ss');
     // 订单最后支付时间
     if (orderInfo.order_status === 0) {
@@ -86,25 +86,20 @@ module.exports = class extends Base {
     const freightPrice = 0.00;
 
     // 获取要购买的商品
-    const checkedGoodsList = await this.model('cart').where({ user_id: think.userId, session_id: 1, checked: 1 }).select();
+
+    this.model('goods').where()
+
+    const checkedGoodsList = await this.model('cart').field('nideshop_cart.*,nideshop_goods.stock_type,nideshop_goods.goods_number,nideshop_goods.name').join('nideshop_goods ON nideshop_goods.id=nideshop_cart.goods_id').where({'nideshop_cart.user_id': think.userId, 'nideshop_cart.session_id':1, 'nideshop_cart.checked':1}).select();
+    //const checkedGoodsList = await this.model('cart').where({ user_id: think.userId, session_id: 1, checked: 1 }).select();
     if (think.isEmpty(checkedGoodsList)) {
       return this.fail('请选择商品');
     }
 
-    // 统计商品总价
-    let goodsTotalPrice = 0.00;
     for (const cartItem of checkedGoodsList) {
-      goodsTotalPrice += cartItem.number * cartItem.retail_price;
-
-      const curGoodsInfo = await this.model('goods').where({ id: cartItem.goods_id}).find();
-      if(think.isEmpty(curGoodsInfo))
+      
+      if(cartItem.goods_number < cartItem.number || cartItem.number > Config.maxNumberOfGoodsInOrder) // 库存不足
       {
-        return this.fail('商品' + curGoodsInfo.name + "不存在或已下架");
-      }
-
-      if(curGoodsInfo.goods_number <cartItem.number || cartItem.number > Config.maxNumberOfGoodsInOrder) // 库存不足
-      {
-        return this.fail('商品' + curGoodsInfo.name + '库存不足');
+        return this.fail('商品' + cartItem.name + '库存不足');
       }
     }
 
@@ -115,66 +110,115 @@ module.exports = class extends Base {
 
     }
 
-    // 订单价格计算
-    const orderTotalPrice = goodsTotalPrice + freightPrice - couponPrice; // 订单的总价
-    const actualPrice = orderTotalPrice - 0.00; // 减去其它支付的金额后，要实际支付的金额
-    const currentTime = parseInt(this.getTime() / 1000);
+    let denmarkGoodsList = []; // 丹麦海外直邮的商品
+    let amazonGoodsList = []; // 亚马逊海外代购的商品
+    let otherGoodsList = []; // 其他的商品
+    let allGoodsList = []; // 所有已分组商品集合
 
-    const orderInfo = {
-      order_sn: this.model('order').generateOrderNumber(),
-      user_id: think.userId,
+    // 对商品分类
+    for (const cartItem of checkedGoodsList) {
 
-      // 收货地址和运费
-      consignee: checkedAddress.name,
-      mobile: checkedAddress.mobile,
-      province: checkedAddress.province_id,
-      city: checkedAddress.city_id,
-      district: checkedAddress.district_id,
-      address: checkedAddress.address,
-      freight_price: 0.00,
+      if(cartItem.stock_type==0) // 亚马逊代购
+      {
+        amazonGoodsList.push(cartItem);
+      }else if(cartItem.stock_type==1) // 丹麦直邮
+      {
+        denmarkGoodsList.push(cartItem);
+      }else // 其他
+      {
+        otherGoodsList.push(cartItem);
+      }
+    }
+    allGoodsList.push(denmarkGoodsList);
+    allGoodsList.push(amazonGoodsList);
+    allGoodsList.push(otherGoodsList);
 
-      // 留言
-      postscript: this.post('postscript'),
 
-      // 使用的优惠券
-      coupon_id: 0,
-      coupon_price: couponPrice,
-
-      add_time: currentTime,
-      goods_price: goodsTotalPrice,
-      order_price: orderTotalPrice,
-      actual_price: actualPrice
-    };
+    let orderInfos = []; // 最后的订单结果信息集合
 
     // 开启事务，插入订单信息和订单商品
-    const orderId = await this.model('order').add(orderInfo);
-    orderInfo.id = orderId;
-    if (!orderId) {
-      return this.fail('订单提交失败');
-    }
+    const model = this.model('order');
+    for(let i=0;i<allGoodsList.length;++i)
+    {
+      let curGoodsList = allGoodsList[i];
+      if(curGoodsList.length ==0 )
+      {
+        continue;
+      }
 
-    // 统计商品总价
-    const orderGoodsData = [];
-    for (const goodsItem of checkedGoodsList) {
-      orderGoodsData.push({
-        order_id: orderId,
-        goods_id: goodsItem.goods_id,
-        goods_sn: goodsItem.goods_sn,
-        product_id: goodsItem.product_id,
-        goods_name: goodsItem.goods_name,
-        list_pic_url: goodsItem.list_pic_url,
-        market_price: goodsItem.market_price,
-        retail_price: goodsItem.retail_price,
-        number: goodsItem.number,
-        goods_specifition_name_value: goodsItem.goods_specifition_name_value,
-        goods_specifition_ids: goodsItem.goods_specifition_ids
-      });
-    }
+       // 统计总价
+      let goodsTotalPrice = 0.00;
+      for(let j=0;j<curGoodsList.length;++j)
+      {
+        let cartItem = curGoodsList[j];
+        goodsTotalPrice += cartItem.number * cartItem.retail_price;
+      }
 
-    await this.model('order_goods').addMany(orderGoodsData);
+      // 订单价格计算
+      //const orderTotalPrice = goodsTotalPrice + freightPrice - couponPrice; // 订单的总价
+      const orderTotalPrice = goodsTotalPrice + freightPrice; // 订单的总价
+      const actualPrice = orderTotalPrice - 0.00; // 减去其它支付的金额后，要实际支付的金额
+      const currentTime = parseInt(this.getTime() / 1000);
+
+      const orderInfo = {
+        order_sn: this.model('order').generateOrderNumber(),
+        user_id: think.userId,
+
+        // 收货地址和运费
+        consignee: checkedAddress.name,
+        mobile: checkedAddress.mobile,
+        province: checkedAddress.province_id,
+        city: checkedAddress.city_id,
+        district: checkedAddress.district_id,
+        address: checkedAddress.address,
+        freight_price: 0.00,
+
+        // 留言
+        postscript: this.post('postscript'),
+
+        // 使用的优惠券
+        coupon_id: 0,
+        coupon_price: couponPrice,
+
+        add_time: currentTime,
+        goods_price: goodsTotalPrice,
+        order_price: orderTotalPrice,
+        actual_price: actualPrice
+      };
+
+      var orderId = null;
+      orderId = await model.add(orderInfo);
+
+      // const orderId = await this.model('order').add(orderInfo);
+      orderInfo.id = orderId;
+      if (!orderId) {
+        return this.fail('订单提交失败');
+      }
+
+      // 添加当前的所有商品
+      const orderGoodsData = [];
+      for (const goodsItem of curGoodsList) {
+        orderGoodsData.push({
+          order_id: orderId,
+          goods_id: goodsItem.goods_id,
+          goods_sn: goodsItem.goods_sn,
+          product_id: goodsItem.product_id,
+          goods_name: goodsItem.goods_name,
+          list_pic_url: goodsItem.list_pic_url,
+          market_price: goodsItem.market_price,
+          retail_price: goodsItem.retail_price,
+          number: goodsItem.number,
+          goods_specifition_name_value: goodsItem.goods_specifition_name_value,
+          goods_specifition_ids: goodsItem.goods_specifition_ids
+        });
+      }
+      await this.model('order_goods').addMany(orderGoodsData);
+
+      orderInfos.push(orderInfo);
+    }
+    
     await this.model('cart').clearBuyGoods();
-
-    return this.success({ orderInfo: orderInfo });
+    return this.success({ orderInfos: orderInfos });
   }
 
   /**

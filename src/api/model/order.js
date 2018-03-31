@@ -71,10 +71,30 @@ module.exports = class extends think.Model {
 
   async getOrderStatusText(orderId) {
     const orderInfo = await this.where({id: orderId}).find();
-    let statusText = '未付款';
+
+    // 等待客服确认-客服已确认-已付款等待发货-已发货-交易完成（第一步时：客户端可取消订单，第二步时：后台可取消订单）
+    let statusText = '未知状态';
     switch (orderInfo.order_status) {
       case 0:
-        statusText = '未付款';
+        statusText = '等待客服确认';
+        break;
+      case 1:
+        statusText = '已确认,等待付款';
+        break;
+      case 2:
+        statusText = '已付款,等待发货';
+        break;
+      case 3:
+        statusText = '已发货';
+        break;
+      case 9:
+        statusText = '交易完成';
+        break;
+      case 98:
+        statusText = '客户已取消订单';
+        break;
+      case 99:
+        statusText = '交易关闭';
         break;
     }
 

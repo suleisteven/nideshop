@@ -71,7 +71,7 @@ module.exports = class extends Base {
     }
 
     // 判断购物车中是否存在此规格商品
-    const cartInfo = await this.model('cart').where({goods_id: goodsId, product_id: productId}).find();
+    const cartInfo = await this.model('cart').where({goods_id: goodsId, user_id: think.userId}).find();
     if (think.isEmpty(cartInfo)) {
       // 添加操作
 
@@ -106,7 +106,7 @@ module.exports = class extends Base {
         checked: 1
       };
 
-      await this.model('cart').thenAdd(cartData, {product_id: productId});
+      await this.model('cart').thenAdd(cartData, {user_id:think.userId, goods_id: goodsId});
     } else {
       // 如果已经存在购物车中，则数量增加
       // if (productInfo.goods_number < (number + cartInfo.number)) {
@@ -120,8 +120,8 @@ module.exports = class extends Base {
 
       await this.model('cart').where({
         goods_id: goodsId,
-        product_id: productId,
-        id: cartInfo.id
+        id: cartInfo.id,
+        user_id:think.userId,
       }).increment('number', number);
     }
     return this.success(await this.getCart());
