@@ -9,9 +9,10 @@ module.exports = class extends Base {
     const page = this.get('page') || 1;
     const size = this.get('size') || 10;
     const name = this.get('name') || '';
+    const nickname = this.get('nickname') || '';
 
     const model = this.model('user');
-    const data = await model.where({username: ['like', `%${name}%`]}).order(['id DESC']).page(page, size).countSelect();
+    const data = await model.where({username: ['like', `%${name}%`], nickname : ['like', `%${nickname}%`]}).order(['id DESC']).page(page, size).countSelect();
 
     return this.success(data);
   }

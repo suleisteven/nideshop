@@ -27,7 +27,7 @@ DROP TABLE IF EXISTS `nideshop_ad`;
 CREATE TABLE `nideshop_ad` (
   `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `ad_position_id` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `media_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `media_type` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '跳转类型：0-商品，1-专题',
   `name` varchar(60) NOT NULL DEFAULT '',
   `link` varchar(255) NOT NULL DEFAULT '',
   `image_url` text NOT NULL,
@@ -1178,3 +1178,5 @@ UNLOCK TABLES;
 alter table nideshop_goods add stock_type int(4) NOT NULL DEFAULT '0' COMMENT '进货类型，0-亚马逊、1-丹麦产地直达';
 
 alter table nideshop_goods add attribute text COMMENT '商品参数，例如：[{"name":"颜色", "value":"白色"},{"name":"尺寸","value":"17*18*20cm"}]';
+
+alter table nideshop_ad add media_id int(11) COMMENT '跳转id，如果meida_type为0则为商品id，如果为1则为专题id';

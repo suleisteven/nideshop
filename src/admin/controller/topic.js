@@ -78,8 +78,24 @@ module.exports = class extends Base {
 
   async destoryAction() {
     const id = this.post('id');
-    await this.model('topic').where({id: id}).limit(1).delete();
-    // TODO 删除图片
+    let obj = await this.model('topic').where({id: id}).limit(1).find();
+    if(obj)
+    {
+
+      // 删除封面
+      FileUtil.deleteImg(obj.scene_pic_url);
+
+      // 删除详情
+      try{
+        obj.content = JSON.parse(obj.content);
+      }catch(e)
+      {
+        obj.content = [];
+      }
+      FileUtil.deleteImg(obj.content);
+
+      this.model('topic').where({id: id}).limit(1).delete();
+    }
 
     return this.success();
   }
