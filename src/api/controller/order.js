@@ -31,6 +31,54 @@ module.exports = class extends Base {
     return this.success(orderList);
   }
 
+  /**
+   * 取消订单
+   */
+  async cancelAction()
+  {
+    const orderId = this.get('orderId');
+    const model = this.model('order');
+    const orderInfo = await model.where({ user_id: think.userId, id: orderId }).find();
+
+    if (think.isEmpty(orderInfo)) {
+      return this.fail('订单不存在');
+    }
+
+    // 订单为0，客服未确认状态时，可以取消
+    if(orderInfo.order_status==0)
+    {
+      await model.where({id: orderId}).update({order_status: 98});
+    }else{
+      return this.fail("当前订单已无法取消");
+    }
+    
+    return this.success(orderId);
+  }
+
+  /**
+   * 确认收货
+   */
+  async confirmAction()
+  {
+    const orderId = this.get('orderId');
+    const model = this.model('order');
+    const orderInfo = await model.where({ user_id: think.userId, id: orderId }).find();
+
+    if (think.isEmpty(orderInfo)) {
+      return this.fail('订单不存在');
+    }
+
+    // 订单为3，已发货时，可以确认收货
+    if(orderInfo.order_status==3)
+    {
+      await model.where({id: orderId}).update({order_status: 9}); // 变为交易完成
+    }else{
+      return this.fail("当前订单已无法确认收货");
+    }
+    
+    return this.success(orderId);
+  }
+
   async detailAction() {
     const orderId = this.get('orderId');
     const orderInfo = await this.model('order').where({ user_id: think.userId, id: orderId }).find();

@@ -26,11 +26,38 @@ module.exports = class extends Base {
     const id = this.get('id');
     const model = this.model('order');
 
-    //const checkedGoodsList = await model.field('nideshop_order.*,nideshop_goods.stock_type,nideshop_goods.goods_number,nideshop_goods.name').join('nideshop_goods ON nideshop_goods.id=nideshop_cart.goods_id').where({'nideshop_cart.user_id': think.userId, 'nideshop_cart.session_id':1, 'nideshop_cart.checked':1}).select();
+    const orderInfos = await model.field('nideshop_order.*,nideshop_region.name').join('nideshop_region ON nideshop_order.province = nideshop_region.id OR nideshop_order.city = nideshop_region.id OR nideshop_order.district = nideshop_region.id').where({'nideshop_order.id': id}).select();
 
-    const data = await model.where({id: id}).find();
+    if(think.isEmpty(orderInfos))
+    {
+      return this.fail('订单不存在');
+    }
+    let orderInfo = orderInfos[0];
 
-    return this.success(data);
+    let orderStatusText = await model.getOrderStatusText(id);
+    orderInfo.orderStatusText = orderStatusText;
+
+    let detailAddress = '';
+    for(let i=0;i<orderInfos.length;++i)
+    {
+      detailAddress += orderInfos[i].name;
+    }
+    detailAddress += orderInfo.address;
+    orderInfo.detailAddress = detailAddress; // 返回详细地址
+
+    const goodsInfos = await this.model('order_goods').field('nideshop_goods.*').join('nideshop_goods ON nideshop_order_goods.goods_id = nideshop_goods.id').where({'nideshop_order_goods.order_id': id}).select();
+    orderInfo.goodsInfos = goodsInfos;
+    // const data = await model.where({id: id}).find();
+
+    return this.success(orderInfo);
+  }
+
+  async orderStatusToTextAction() {
+
+    
+    const status = this.get('order_status');
+    let orderStatusText = this.model('order').orderStatusToText(parseInt(status));
+    return this.success(orderStatusText);
   }
 
   async storeAction() {
@@ -42,14 +69,13 @@ module.exports = class extends Base {
     const id = this.post('id');
 
     const model = this.model('order');
-    values.is_show = values.is_show ? 1 : 0;
-    values.is_new = values.is_new ? 1 : 0;
-    if (id > 0) {
-      await model.where({id: id}).update(values);
-    } else {
-      delete values.id;
-      await model.add(values);
+
+    if (id > 0 && !think.isEmpty(values.order_status)) {
+      await model.where({id: id}).update({order_status: parseInt(values.order_status)});
+    }else{
+      return this.fail("订单错误");
     }
+    
     return this.success(values);
   }
 

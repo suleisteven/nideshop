@@ -10,8 +10,8 @@ module.exports = {
   },
   express: {
     // 快递物流信息查询使用的是快递鸟接口，申请地址：http://www.kdniao.com/
-    appid: '', // 对应快递鸟用户后台 用户ID
-    appkey: '', // 对应快递鸟用户后台 API key
+    appid: '1330269', // 对应快递鸟用户后台 用户ID
+    appkey: '11b787e7-f3f1-44ab-8fb6-2137a48b3a7f', // 对应快递鸟用户后台 API key
     request_url: 'http://api.kdniao.cc/Ebusiness/EbusinessOrderHandle.aspx'
   },
   imgUrlPrefix: "http://127.0.0.1:8360",
