@@ -25,6 +25,9 @@ module.exports = class extends Base {
   async infoAction() {
     const id = this.get('id');
     const model = this.model('order');
+
+    //const checkedGoodsList = await model.field('nideshop_order.*,nideshop_goods.stock_type,nideshop_goods.goods_number,nideshop_goods.name').join('nideshop_goods ON nideshop_goods.id=nideshop_cart.goods_id').where({'nideshop_cart.user_id': think.userId, 'nideshop_cart.session_id':1, 'nideshop_cart.checked':1}).select();
+
     const data = await model.where({id: id}).find();
 
     return this.success(data);

@@ -164,7 +164,7 @@ module.exports = class extends Base {
       return this.success(await this.getCart());
     }
 
-    const newCartInfo = await this.model('cart').where({goods_id: goodsId, product_id: productId}).find();
+    const newCartInfo = await this.model('cart').where({goods_id: goodsId, product_id: productId, user_id:think.userId}).find();
     if (think.isEmpty(newCartInfo)) {
       // 直接更新原来的cartInfo
 
@@ -233,29 +233,31 @@ module.exports = class extends Base {
 
   // 是否选择商品，如果已经选择，则取消选择，批量操作
   async checkedAction() {
-    let productId = this.post('productIds').toString();
+    let goodsIds = this.post('goodsIds').toString();
     const isChecked = this.post('isChecked');
 
-    if (think.isEmpty(productId)) {
+    if (think.isEmpty(goodsIds)) {
       return this.fail('删除出错');
     }
 
-    productId = productId.split(',');
-    await this.model('cart').where({product_id: {'in': productId}}).update({checked: parseInt(isChecked)});
+    goodsIds = goodsIds.split(',');
+    await this.model('cart').where({goods_id: {'in': goodsIds}, user_id:think.userId}).update({checked: parseInt(isChecked)});
 
     return this.success(await this.getCart());
   }
 
   // 删除选中的购物车商品，批量删除
   async deleteAction() {
-    let productId = this.post('productIds');
-    if (!think.isString(productId)) {
+    // let productId = this.post('productIds');
+
+    let goodsIds = this.post('goodsIds');
+    if (!think.isString(goodsIds)) {
       return this.fail('删除出错');
     }
 
-    productId = productId.split(',');
+    goodsIds = goodsIds.split(',');
 
-    await this.model('cart').where({product_id: {'in': productId}}).delete();
+    await this.model('cart').where({goods_id: {'in': goodsIds}, user_id:think.userId}).delete();
 
     return this.success(await this.getCart());
   }

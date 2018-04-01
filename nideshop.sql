@@ -731,7 +731,7 @@ CREATE TABLE `nideshop_order` (
   `shipping_status` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `pay_status` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `consignee` varchar(60) NOT NULL DEFAULT '',
-  `country` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `country` smallint(5) unsigned NOT NULL DEFAULT '1',
   `province` smallint(5) unsigned NOT NULL DEFAULT '0',
   `city` smallint(5) unsigned NOT NULL DEFAULT '0',
   `district` smallint(5) unsigned NOT NULL DEFAULT '0',
