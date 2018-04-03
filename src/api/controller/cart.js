@@ -323,7 +323,7 @@ module.exports = class extends Base {
     return this.success({
       checkedAddress: checkedAddress,
       //freightPrice: freightPrice,
-      freightPrice: '根据实际情况收取',
+      freightPrice: '根据实际情况收取,详情咨询客服',
       checkedCoupon: {},
       couponList: couponList,
       couponPrice: couponPrice,
