@@ -7,11 +7,11 @@ module.exports = class extends Base {
 
     const admin = await this.model('admin').where({ username: username }).find();
     if (think.isEmpty(admin)) {
-      return this.fail(401, '用户名或密码不正确1');
+      return this.fail(401, '用户名或密码不正确');
     }
 
     if (think.md5(password + '' + admin.password_salt) !== admin.password) {
-      return this.fail(400, '用户名或密码不正确2');
+      return this.fail(400, '用户名或密码不正确');
     }
 
     // 更新登录信息

@@ -9,11 +9,21 @@ module.exports = class extends Base {
     }
 
     async receiveWechatAction() {
-        let data = this.post();
 
-        //console.log("receiveWechat:" + data);
-        this.printObjectWithHead("receiveWechat:", data);
-        return this.success();
+        if(this.isPost)
+        {
+            let data = this.post();
+            this.printObjectWithHead("post receiveWechat:", data);
+            return this.success();
+
+        }else if(this.isGet)
+        {
+            let data = this.get();
+            this.printObjectWithHead("get receiveWechat:", data);
+
+            this.body = this.get('echostr');
+            return;
+        }
     }
 
     printObjectWithHead(head, obj) {
