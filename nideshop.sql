@@ -1174,10 +1174,10 @@ UNLOCK TABLES;
 
 -- Dump completed on 2018-02-09 20:26:21
 
-
+DROP TABLE IF EXISTS `nideshop_system_config`;
 CREATE TABLE `nideshop_system_config` (
   `id` tinyint(3) unsigned NOT NULL AUTO_INCREMENT,
-  `key` varchar(30) NOT NULL DEFAULT '' COMMENT '配置key',
+  `key` varchar(30) NOT NULL DEFAULT '' COMMENT '跳转类型：0-商品，1-专题配置key',
   `value` varchar(255) NOT NULL DEFAULT '' COMMENT '配置值',
   `description` varchar(255) NOT NULL DEFAULT '' COMMENT '描述',
   PRIMARY KEY (`id`)
@@ -1199,4 +1199,33 @@ alter table nideshop_ad add media_id int(11) COMMENT '跳转id，如果meida_typ
 alter table nideshop_category add seller_contact varchar(30) NOT NULL DEFAULT '' COMMENT '商家联系电话';
 alter table nideshop_category add pay_qrcode text COMMENT '商家收款码';
 
+
+delete  from nideshop_ad;
+delete  from nideshop_address;
+delete  from nideshop_attribute;
+delete  from nideshop_attribute_category;
+delete  from nideshop_brand;
+delete  from nideshop_category;
+delete  from nideshop_collect;
+delete  from nideshop_comment;
+delete  from nideshop_comment_picture;
+delete  from nideshop_coupon;
+delete  from nideshop_feedback;
+delete  from nideshop_footprint;
+delete  from nideshop_goods;
+delete  from nideshop_goods_attribute;
+delete  from nideshop_goods_gallery;
+delete  from nideshop_goods_specification;
+delete  from nideshop_keywords;
+delete  from nideshop_order;
+delete  from nideshop_order_express;
+delete  from nideshop_order_goods;
+delete  from nideshop_product;
+delete  from nideshop_search_history;
+delete  from nideshop_specification;
+delete  from nideshop_topic;
+delete  from nideshop_topic_category;
+delete  from nideshop_user;
+delete  from nideshop_user_coupon;
+delete  from nideshop_user_level;
 
