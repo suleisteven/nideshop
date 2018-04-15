@@ -138,7 +138,7 @@ CREATE TABLE `nideshop_admin` (
 
 LOCK TABLES `nideshop_admin` WRITE;
 /*!40000 ALTER TABLE `nideshop_admin` DISABLE KEYS */;
-INSERT INTO `nideshop_admin` VALUES (1,'admin','bb87bf23d14b27de74530dec20e234f3','ABCDEF','::ffff:127.0.0.1',1505484711,0,0,'\'\'',0);
+INSERT INTO `nideshop_admin` VALUES (1,'admin','574ac932d4f3003718603985fcc5c68c','ABCDEF','::ffff:127.0.0.1',1505484711,0,0,'\'\'',0);
 /*!40000 ALTER TABLE `nideshop_admin` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1174,9 +1174,29 @@ UNLOCK TABLES;
 
 -- Dump completed on 2018-02-09 20:26:21
 
+
+CREATE TABLE `nideshop_system_config` (
+  `id` tinyint(3) unsigned NOT NULL AUTO_INCREMENT,
+  `key` varchar(30) NOT NULL DEFAULT '' COMMENT '配置key',
+  `value` varchar(255) NOT NULL DEFAULT '' COMMENT '配置值',
+  `description` varchar(255) NOT NULL DEFAULT '' COMMENT '描述',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+
+LOCK TABLES `nideshop_system_config` WRITE;
+INSERT INTO `nideshop_system_config` VALUES (1,'provider_contact', '', '客服联系方式,值为电话号码'),(2,'is_pending','0', '是否是审核模式,1-审核中，0-未审核');
+UNLOCK TABLES;
+
+
 /*`stock_type` int(4) NOT NULL DEFAULT '0' COMMENT '进货类型，0-亚马逊、1-丹麦产地直达',*/
 alter table nideshop_goods add stock_type int(4) NOT NULL DEFAULT '0' COMMENT '进货类型，0-亚马逊、1-丹麦产地直达';
-
 alter table nideshop_goods add attribute text COMMENT '商品参数，例如：[{"name":"颜色", "value":"白色"},{"name":"尺寸","value":"17*18*20cm"}]';
+alter table nideshop_goods add link_jd varchar(500) NOT NULL DEFAULT '' COMMENT '京东外链';
+alter table nideshop_goods add link_amazon varchar(500) NOT NULL DEFAULT '' COMMENT '亚马逊外链';
 
 alter table nideshop_ad add media_id int(11) COMMENT '跳转id，如果meida_type为0则为商品id，如果为1则为专题id';
+
+alter table nideshop_category add seller_contact varchar(30) NOT NULL DEFAULT '' COMMENT '商家联系电话';
+alter table nideshop_category add pay_qrcode text COMMENT '商家收款码';
+
+

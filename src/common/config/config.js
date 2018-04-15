@@ -14,8 +14,8 @@ module.exports = {
     appkey: '11b787e7-f3f1-44ab-8fb6-2137a48b3a7f', // 对应快递鸟用户后台 API key
     request_url: 'http://api.kdniao.cc/Ebusiness/EbusinessOrderHandle.aspx'
   },
-  // imgUrlPrefix: "http://127.0.0.1:8360/",
-  imgUrlPrefix: "http://cdn.flyinthesky.cn",
+  imgUrlPrefix: "http://127.0.0.1:8360",
+  //imgUrlPrefix: "http://cdn.flyinthesky.cn",
 
   imgRootPath:"/www", // 上传图片所在目录
 

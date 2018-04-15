@@ -44,8 +44,8 @@ module.exports = class extends Base {
       return this.fail('订单不存在');
     }
 
-    // 订单为0，客服未确认状态时，可以取消
-    if(orderInfo.order_status==0)
+    // 订单为0和1，客服未确认状态时，可以取消
+    if(orderInfo.order_status<=1)
     {
       await model.where({id: orderId}).update({order_status: 98});
     }else{
@@ -87,6 +87,7 @@ module.exports = class extends Base {
       return this.fail('订单不存在');
     }
 
+
     orderInfo.province_name = await this.model('region').where({ id: orderInfo.province }).getField('name', true);
     orderInfo.city_name = await this.model('region').where({ id: orderInfo.city }).getField('name', true);
     orderInfo.district_name = await this.model('region').where({ id: orderInfo.district }).getField('name', true);
@@ -96,6 +97,25 @@ module.exports = class extends Base {
     orderInfo.express = latestExpressInfo;
 
     const orderGoods = await this.model('order_goods').where({ order_id: orderId }).select();
+
+    if(orderGoods && orderGoods.length>0)
+    {
+
+      let orderGoodsInfo = orderGoods[0];
+
+      // 商家联系方式及收款码
+
+      const goodsInfo = await this.model('goods').field('nideshop_goods.*').join('nideshop_order_goods ON nideshop_order_goods.goods_id = nideshop_goods.id').where({'nideshop_order_goods.goods_id': orderGoodsInfo.goods_id}).find();
+
+      await this.model('goods').where({id: goodsInfo.category_id}).find();
+      const category = await this.model('category').where({id: goodsInfo.category_id}).find();
+      const categoryRoot = await this.model('category').where({id: category.parent_id}).find();
+      orderInfo.seller_contact = categoryRoot.seller_contact;
+      orderInfo.pay_qrcode = categoryRoot.pay_qrcode;
+    }else{
+      orderInfo.seller_contact = '';
+      orderInfo.pay_qrcode = null;
+    }
 
     // 订单状态的处理
     orderInfo.order_status_text = await this.model('order').getOrderStatusText(orderId);
@@ -109,6 +129,8 @@ module.exports = class extends Base {
       //     //超过时间不支付，更新订单状态为取消
       // }
     }
+
+    orderInfo.freight_price = '根据实际情况收取,详情咨询客服';
 
     // 订单可操作的选择,删除，支付，收货，评论，退换货
     const handleOption = await this.model('order').getOrderHandleOption(orderId);
@@ -231,7 +253,8 @@ module.exports = class extends Base {
         add_time: currentTime,
         goods_price: goodsTotalPrice,
         order_price: orderTotalPrice,
-        actual_price: actualPrice
+        actual_price: actualPrice,
+        order_status : 1, // 订单状态-默认为未付款
       };
 
       var orderId = null;

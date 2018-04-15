@@ -14,6 +14,7 @@ module.exports = class extends Base {
     const name = this.get('name') || '';
     const category_id = this.get('category_id') || '';
     const sortChecked = this.get('sortChecked') || 0;
+    const goodsTypeSelected = this.get('goodsTypeSelected') || 0;
     
 
     const model = this.model('goods');
@@ -23,6 +24,11 @@ module.exports = class extends Base {
     {
       params.category_id=category_id;
     }
+
+    if(!think.isEmpty(goodsTypeSelected))
+    {
+      params.stock_type = goodsTypeSelected;
+    }
     
     let sortParams = [];
     if(sortChecked==0)
@@ -31,6 +37,8 @@ module.exports = class extends Base {
     }else{
       sortParams = ['id DESC'];
     }
+
+    
 
     const data = await model.where(params).order(sortParams).page(page, size).countSelect();
 
@@ -90,6 +98,8 @@ module.exports = class extends Base {
     values.is_new = values.is_new ? 1 : 0;
     values.is_hot = values.is_hot ? 1 : 0;
 
+    values.brand_id = 0; // 品牌id不需要
+    
     values.goods_desc = FileUtil.moveTmpImgToFinal(values.goods_desc); // 将商品详情图片移动到正式目录
 
     let movedPosterImgs = FileUtil.moveTmpImgToFinal(values.list_pic_url); // 将商品封面移动到正式目录

@@ -11,7 +11,8 @@ module.exports = {
     'brand',
     'search',
     'region',
-    'wechat'
+    'wechat',
+    'systemConfig',
   ],
 
   // 可以公开访问的Action

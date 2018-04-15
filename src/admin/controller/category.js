@@ -84,6 +84,12 @@ module.exports = class extends Base {
       values.wap_banner_url = movedPosterImgs[0];
     }
 
+    let movedPayQRCodeImgs = FileUtil.moveTmpImgToFinal(values.pay_qrcode); // 将收款码移动到正式目录
+    if(movedPayQRCodeImgs && movedPayQRCodeImgs.length>0)
+    {
+      values.pay_qrcode = movedPayQRCodeImgs[0];
+    }
+
     if(id==0)
     {
       values.level = 'L1';
@@ -104,8 +110,13 @@ module.exports = class extends Base {
 
   async destoryAction() {
     const id = this.post('id');
+
+    let obj = await this.model('category').where({id: id}).limit(1).find();
+
+    // 删除封面
+    FileUtil.deleteImg(obj.wap_banner_url);
+
     await this.model('category').where({id: id}).limit(1).delete();
-    // TODO 删除图片
 
     return this.success();
   }

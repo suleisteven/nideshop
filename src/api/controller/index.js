@@ -46,7 +46,12 @@ module.exports = class extends Base {
 
     for (const categoryItem of categoryList) {
       const childCategoryIds = await this.model('category').where({parent_id: categoryItem.id}).getField('id', 100);
-      const categoryGoods = await this.model('goods').field(['id', 'name', 'list_pic_url', 'retail_price']).where({category_id: ['IN', childCategoryIds]}).limit(7).select();
+
+      let categoryGoods = [];
+      if(childCategoryIds.length>0)
+      {
+        categoryGoods = await this.model('goods').field(['id', 'name', 'list_pic_url', 'retail_price']).where({category_id: ['IN', childCategoryIds]}).limit(7).select();
+      }
       newCategoryList.push({
         id: categoryItem.id,
         name: categoryItem.name,

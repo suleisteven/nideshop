@@ -33,9 +33,50 @@ module.exports = class extends Base {
       id: admin.id,
       username: admin.username,
       avatar: admin.avatar,
-      admin_role_id: admin.admin_role_id
+      admin_role_id: admin.admin_role_id,
+      last_login_time: admin.last_login_time,
+      last_login_ip: admin.last_login_ip
     };
 
     return this.success({ token: sessionKey, userInfo: userInfo });
   }
+
+  async infoAction() {
+    const id = this.get('id');
+    const model = this.model('admin');
+    const data = await model.where({id: id}).find();
+
+    return this.success(data);
+  }
+  
+  async storeAction() {
+    const id = this.post('id');
+    const oldPassword = this.post('oldPassword');
+    const newPassword = this.post('newPassword');
+
+    if(think.isEmpty(id) || think.isEmpty(oldPassword) || think.isEmpty(newPassword))
+    {
+      return this.fail("参数错误");
+    }
+
+    const admin = await this.model('admin').where({ id: id }).find();
+
+    if(think.isEmpty(admin))
+    {
+      return this.fail("用户不存在");
+    }
+
+    if (think.md5(oldPassword + '' + admin.password_salt) !== admin.password) {
+      return this.fail(400, '原密码错误');
+    }
+
+    let realNewPassword = think.md5(newPassword + '' + admin.password_salt);
+    
+    await this.model('admin').where({ id: admin.id }).update({
+      password: realNewPassword
+    });
+
+    return this.success("密码修改成功，请重新登录");
+  }
+
 };

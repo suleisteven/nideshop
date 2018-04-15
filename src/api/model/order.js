@@ -79,10 +79,10 @@ module.exports = class extends think.Model {
         statusText = '等待客服确认';
         break;
       case 1:
-        statusText = '已确认,等待付款';
+        statusText = '待付款';
         break;
       case 2:
-        statusText = '已付款,等待发货';
+        statusText = '已付款,待发货';
         break;
       case 3:
         statusText = '已发货';

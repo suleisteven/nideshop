@@ -64,6 +64,12 @@ module.exports = class extends Base {
     const issue = await this.model('goods_issue').select();
     const brand = await this.model('brand').where({id: info.brand_id}).find();
 
+    // 商家联系方式及收款码
+    const category = await this.model('category').where({id: info.category_id}).find();
+    const categoryRoot = await this.model('category').where({id: category.parent_id}).find();
+    info.seller_contact = categoryRoot.seller_contact;
+    info.pay_qrcode = categoryRoot.pay_qrcode;
+
     // 不加载评论
     // const commentCount = await this.model('comment').where({value_id: goodsId, type_id: 0}).count();
     // const hotComment = await this.model('comment').where({value_id: goodsId, type_id: 0}).find();
