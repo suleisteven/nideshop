@@ -1,0 +1,9 @@
+// 导出所有数据，仅数据
+mysqldump -uroot -proot --no-create-info nideshop > d:/test1.txt
+
+// 导出数据+建表语句
+mysqldump -uroot -proot nideshop > d:/test.txt
+
+// 导入数据
+mysql -uroot -proot --default-character-set=utf8mb4
+source ./xxx.sql
