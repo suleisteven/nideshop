@@ -462,7 +462,7 @@ DROP TABLE IF EXISTS `nideshop_feedback`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `nideshop_feedback` (
-  `msg_id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `parent_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `user_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `user_name` varchar(60) NOT NULL DEFAULT '',
@@ -475,7 +475,7 @@ CREATE TABLE `nideshop_feedback` (
   `message_img` varchar(255) NOT NULL DEFAULT '0',
   `order_id` int(11) unsigned NOT NULL DEFAULT '0',
   `msg_area` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`msg_id`),
+  PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1200,32 +1200,32 @@ alter table nideshop_category add seller_contact varchar(30) NOT NULL DEFAULT ''
 alter table nideshop_category add pay_qrcode text COMMENT '商家收款码';
 
 
-delete  from nideshop_ad;
-delete  from nideshop_address;
-delete  from nideshop_attribute;
-delete  from nideshop_attribute_category;
-delete  from nideshop_brand;
-delete  from nideshop_category;
-delete  from nideshop_collect;
-delete  from nideshop_comment;
-delete  from nideshop_comment_picture;
-delete  from nideshop_coupon;
-delete  from nideshop_feedback;
-delete  from nideshop_footprint;
-delete  from nideshop_goods;
-delete  from nideshop_goods_attribute;
-delete  from nideshop_goods_gallery;
-delete  from nideshop_goods_specification;
-delete  from nideshop_keywords;
-delete  from nideshop_order;
-delete  from nideshop_order_express;
-delete  from nideshop_order_goods;
-delete  from nideshop_product;
-delete  from nideshop_search_history;
-delete  from nideshop_specification;
-delete  from nideshop_topic;
-delete  from nideshop_topic_category;
-delete  from nideshop_user;
-delete  from nideshop_user_coupon;
-delete  from nideshop_user_level;
+-- delete  from nideshop_ad;
+-- delete  from nideshop_address;
+-- delete  from nideshop_attribute;
+-- delete  from nideshop_attribute_category;
+-- delete  from nideshop_brand;
+-- delete  from nideshop_category;
+-- delete  from nideshop_collect;
+-- delete  from nideshop_comment;
+-- delete  from nideshop_comment_picture;
+-- delete  from nideshop_coupon;
+-- delete  from nideshop_feedback;
+-- delete  from nideshop_footprint;
+-- delete  from nideshop_goods;
+-- delete  from nideshop_goods_attribute;
+-- delete  from nideshop_goods_gallery;
+-- delete  from nideshop_goods_specification;
+-- delete  from nideshop_keywords;
+-- delete  from nideshop_order;
+-- delete  from nideshop_order_express;
+-- delete  from nideshop_order_goods;
+-- delete  from nideshop_product;
+-- delete  from nideshop_search_history;
+-- delete  from nideshop_specification;
+-- delete  from nideshop_topic;
+-- delete  from nideshop_topic_category;
+-- delete  from nideshop_user;
+-- delete  from nideshop_user_coupon;
+-- delete  from nideshop_user_level;
 
