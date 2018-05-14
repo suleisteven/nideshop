@@ -63,6 +63,8 @@ module.exports = {
   }
 };
 ```
+#调试
+node --inspect development.js
 
 + 安装依赖并启动
 ```
