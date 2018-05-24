@@ -42,7 +42,7 @@ module.exports = class extends Base {
     //const hotGoods = await this.model('goods').field(['id', 'name', 'list_pic_url', 'retail_price', 'goods_brief']).where({is_hot: 1}).limit(3).select();
 
     // 推荐商品改为随机推荐8条
-    const hotGoods = await this.model().query('select id,name,list_pic_url,retail_price,goods_brief from nideshop_goods order by rand() limit 8');
+    const hotGoods = await this.model().query('select id,name,list_pic_url,retail_price,goods_brief from nideshop_goods where is_on_sale=1 order by rand() limit 8');
 
     //const brandList = await this.model('brand').where({is_new: 1}).order({new_sort_order: 'asc'}).limit(4).select();
     //const topicList = await this.model('topic').limit(3).select();
