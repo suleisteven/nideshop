@@ -53,7 +53,7 @@ module.exports = class extends Base {
     });
     info.goods_desc = tmpDesc;
 
-    const gallery = await this.model('goods_gallery').where({goods_id: goodsId}).limit(8).select();
+    const gallery = await this.model('goods_gallery').where({goods_id: goodsId, is_on_sale:1}).limit(8).select();
     //const attribute = await this.model('goods_attribute').field('nideshop_goods_attribute.value, nideshop_attribute.name').join('nideshop_attribute ON nideshop_goods_attribute.attribute_id=nideshop_attribute.id').order({'nideshop_goods_attribute.id': 'asc'}).where({'nideshop_goods_attribute.goods_id': goodsId}).select();
     let attribute = [];
     if(!think.isEmpty(info.attribute))
@@ -251,6 +251,7 @@ module.exports = class extends Base {
     if (!think.isEmpty(keyword)) {
       goodsQuery.where({name: {'like': `%${keyword}%`}});
     }
+    goodsQuery.where({is_on_sale:1});
 
     let filterCategory = [{
       'id': 0,
@@ -314,9 +315,9 @@ module.exports = class extends Base {
     if (think.isEmpty(relatedGoodsIds)) {
       // 查找同分类下的商品
       const goodsCategory = await model.where({id: goodsId}).find();
-      relatedGoods = await model.where({category_id: goodsCategory.category_id}).field(['id', 'name', 'list_pic_url', 'retail_price']).limit(8).select();
+      relatedGoods = await model.where({category_id: goodsCategory.category_id, is_on_sale:1}).field(['id', 'name', 'list_pic_url', 'retail_price']).limit(8).select();
     } else {
-      relatedGoods = await model.where({id: ['IN', relatedGoodsIds]}).field(['id', 'name', 'list_pic_url', 'retail_price']).select();
+      relatedGoods = await model.where({id: ['IN', relatedGoodsIds], is_on_sale:1}).field(['id', 'name', 'list_pic_url', 'retail_price']).select();
     }
 
     return this.success({

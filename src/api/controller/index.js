@@ -56,7 +56,7 @@ module.exports = class extends Base {
       let categoryGoods = [];
       if(childCategoryIds.length>0)
       {
-        categoryGoods = await this.model('goods').field(['id', 'name', 'list_pic_url', 'retail_price']).where({category_id: ['IN', childCategoryIds]}).limit(7).select();
+        categoryGoods = await this.model('goods').field(['id', 'name', 'list_pic_url', 'retail_price']).where({category_id: ['IN', childCategoryIds], is_on_sale:1}).limit(7).select();
       }
       newCategoryList.push({
         id: categoryItem.id,
