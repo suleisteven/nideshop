@@ -53,7 +53,7 @@ module.exports = class extends Base {
     });
     info.goods_desc = tmpDesc;
 
-    const gallery = await this.model('goods_gallery').where({goods_id: goodsId, is_on_sale:1}).limit(8).select();
+    const gallery = await this.model('goods_gallery').where({goods_id: goodsId}).limit(8).select();
     //const attribute = await this.model('goods_attribute').field('nideshop_goods_attribute.value, nideshop_attribute.name').join('nideshop_attribute ON nideshop_goods_attribute.attribute_id=nideshop_attribute.id').order({'nideshop_goods_attribute.id': 'asc'}).where({'nideshop_goods_attribute.goods_id': goodsId}).select();
     let attribute = [];
     if(!think.isEmpty(info.attribute))
